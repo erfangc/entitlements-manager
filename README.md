@@ -166,5 +166,61 @@ That's it ...
 
 # Example of Microservices In Action
 
-## 1. `BankAccountService` to allow users to create bank accounts
+## Eaxample 1. `BankAccountService` to allow users to create bank accounts
 
+The API caller (authenticated as `john`) has the following `User` object:
+
+```yaml
+entityType: User
+entityId: john
+tokens: [group:acme_corp_employee]
+entitlements:
+ admin:
+  - group:acme_corp_administrators
+  - group:administrators
+defaultPolicy:
+ policyId: p1
+ bankAccounts:
+  view:
+   - group:acme_corp_treasurers
+  move_money:
+   - group:acme_corp_treasurers
+```
+
+ >
+ > Note the new `defaultPolicy` block - this is a separate object which instructs the microservice how to populate the default
+ > entitlements for various objects that the user creates on the system. The `BankAccountService` must respect this `defaultPolicy`
+ > 
+
+### Sequence of events:
+
+```mermaid
+sequenceDiagram
+ actor caller as Caller (userId = john)
+ participant ba as BankAccountService
+ participant u as UserService
+ 
+ caller->>ba: POST /bank-accounts
+ ba->>u: GET /users/john
+ u-->>ba: { entitlements.admin: [...], defaultPolicy: { ... } }
+ 
+ ba->>ba: Saves bank account with entitlements
+ ba-->>caller: 200
+```
+
+The resulting `BankAccount` is as follows:
+
+```yaml
+entityType: BankAccount
+entityId: BA0023
+entitlements:
+ view:
+  - user:john
+  - group:acme_corp_treasurers
+ move_money:
+  - user:john
+  - group:acme_corp_treasurers
+ admin:
+  - group:acme_corp_administrators
+  - group:administrators
+```
