@@ -104,3 +104,13 @@ entitlements:
    - user:acme_corp_administrators
 ```
 
+# Solving Use Cases
+
+Let's take the use case from above:
+
+ > As an employee of "Acme Corp", any articles I create should be visible to my organization's administrators
+
+When our user `john` goes to create an `Article`. We check that `acme_corp_administrators` is part of this `User`'s `entitlements.admin` action. Therefore, the resulting `Article` must have `admin: [acme_corp_administrators]`. In fact - all values of the user's `entitlements.admin` block is copied over to the descendant object's `entitlements.admin` property
+
+This makes senses because we are basically saying: any entities spawned the user is administrable by anyone who can administer the user. This transitive copying of administrative privileges ensures that the top dogs at Acme Corp can always keep an eye on what their employees are doing
+
