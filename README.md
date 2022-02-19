@@ -278,3 +278,4 @@ entitlements:
 ```
 
  > If we do not want _john_ to share his creation, we can add a property to `User` called `disableSharing` or create a property within `defaultPolicy` that explicitly enumerate whom the policy holder is allowed to share with
+
