@@ -167,7 +167,7 @@ That's it ...
 
 # Example of Microservices In Action
 
-## Eaxample 1. `BankAccountService` to allow users to create bank accounts
+## Example 1. `BankAccountService` to allow users to create bank accounts
 
 The API caller (authenticated as `john`) has the following `User` object:
 
@@ -225,3 +225,56 @@ entitlements:
   - group:acme_corp_administrators
   - group:administrators
 ```
+
+## Example 2. `BankAccountService` that allows creators to _share_ a new bank account
+
+The API caller (authenticated as `john`) has the following `User` object:
+
+```yaml
+entityType: User
+entityId: john
+tokens: [group:acme_corp_employee]
+entitlements:
+ admin:
+  - group:acme_corp_administrators
+  - group:administrators
+defaultPolicy:
+ policyId: p1
+ ...
+```
+
+### Sequence of events:
+
+```mermaid
+sequenceDiagram
+ actor caller as Caller (userId = john)
+ participant ba as BankAccountService
+ participant u as UserService
+ 
+ caller->>ba: POST /bank-accounts?entitlements.view=group:acme_vendors
+ ba->>u: GET /users/john
+ u-->>ba: { entitlements.admin: [...], defaultPolicy: { ... } }
+ 
+ ba->>ba: Saves bank account with entitlements
+ ba-->>caller: 200
+```
+
+The resulting `BankAccount` is as follows:
+
+```yaml
+entityType: BankAccount
+entityId: BA0023
+entitlements:
+ view:
+  - user:john
+  - group:acme_corp_treasurers
+  - group:acme_vendors # notice this new line
+ move_money:
+  - user:john
+  - group:acme_corp_treasurers
+ admin:
+  - group:acme_corp_administrators
+  - group:administrators
+```
+
+ > If we do not want _john_ to share his creation, we can add a property to `User` called `disableSharing` or create a property within `defaultPolicy` that explicitly enumerate whom the policy holder is allowed to share with
