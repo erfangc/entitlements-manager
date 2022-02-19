@@ -114,3 +114,31 @@ When our user `john` goes to create an `Article`. We check that `acme_corp_admin
 
 This makes senses because we are basically saying: any entities spawned the user is administrable by anyone who can administer the user. This transitive copying of administrative privileges ensures that the top dogs at Acme Corp can always keep an eye on what their employees are doing
 
+# How do I add a user to a group?
+
+If you have `admin` perms on a specific `User` then you can modify their `token` property to add them to a group. For exampel:
+
+Suppose you are an admin from Acme Corp, and John is an employee:
+
+```yaml
+entityType: User
+entityId: john
+token:
+ - user:john
+ - group:acme_corp_employees
+entitlements:
+ admin:
+  - group:acme_corp_administrators
+```
+
+Further suppose, now you'd like to add him to the Party planning committee at your company, then you'd call the following REST API:
+
+```http
+PUT /api/v1/users/john
+{
+  token: [acme_corp_party_planning_committee]
+  effect: add
+}
+```
+
+This call will succeed because you - being part of `group:acme_corp_administrators` - have `admin` privilege on `User: john`
