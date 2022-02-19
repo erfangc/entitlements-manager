@@ -154,6 +154,7 @@ The above request will fail, because John does not possess `admin` privilege on 
 - 1 table per Entity (such as `Article`, `BankAccount`, `ShoppingCart` etc.)
 - A `User` table
 - A `Group` table
+- A `DefaultPolicy` table (to be explained later)
 
 That's it ... 
 
