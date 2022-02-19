@@ -44,6 +44,7 @@ entityType: User
 entityId: john
 tokens:
  - group:premium_readers
+ - group:acme_corp_employees
 entitlements:
  view:
   - user:john
