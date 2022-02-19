@@ -136,8 +136,8 @@ Further suppose, now you'd like to add him to the Party planning committee at yo
 ```http
 PUT /api/v1/users/john
 {
-  token: [acme_corp_party_planning_committee]
-  effect: add
+  "token": ["acme_corp_party_planning_committee"]
+  "effect": "add"
 }
 ```
 
