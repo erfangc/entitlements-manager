@@ -127,11 +127,13 @@ token:
  - user:john
  - group:acme_corp_employees
 entitlements:
+ view:
+  - user:john
  admin:
   - group:acme_corp_administrators
 ```
 
-Further suppose, now you'd like to add him to the Party planning committee at your company, then you'd call the following REST API:
+### Now you'd like to add him to the Party planning committee at your company, then you'd call the following REST API:
 
 ```http
 PUT /api/v1/users/john
@@ -142,3 +144,27 @@ PUT /api/v1/users/john
 ```
 
 This call will succeed because you - being part of `group:acme_corp_administrators` - have `admin` privilege on `User: john`
+
+### What if John tries to add himself as a member of the party planning committee?
+
+The above request will fail, because John does not possess `admin` privilege on his own profile and thus cannot modify `token`
+
+# Database Tables Needed:
+
+- 1 table per Entity (such as `Article`, `BankAccount`, `ShoppingCart` etc.)
+- A `User` table
+- A `Group` table
+
+That's it ... 
+
+# Microservices Needed:
+
+- A `UserService` that will manage `User` and `Group` lifecycles
+- Each entity can be managed by their corresponding microservices however your organization wish to divide up the domain boundaries
+
+> Each microservice will need to call the `UserService` to get User and Group permissions
+
+# Example of Microservices In Action
+
+## 1. `BankAccountService` to allow users to create bank accounts
+
